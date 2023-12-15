@@ -41,4 +41,18 @@ public class CourseService {
         courseRepository.deleteById(id);
         courseRepository.flush();
     }
+//    @Transactional
+    public Course courseById(Long courseId) {
+        if(courseRepository.existsById(courseId)){
+            return courseRepository.findById(courseId).orElseThrow(
+                    () -> (
+                            new IllegalStateException(
+                                    "Student id doesn't exists"
+                            )
+                    )
+            );
+        }else{
+            throw new IllegalStateException("Student id doesn't exists");
+        }
+    }
 }

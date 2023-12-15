@@ -43,9 +43,13 @@ public class Student {
     //default name of the fk column is also workstation_id
     @JoinColumn(name = "workstation_id")
     private Workstation workstation;
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "student_id", referencedColumnName = "id")
-    private List<Course> course;
+    @ManyToMany
+    @JoinTable(
+            name = "student_course",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private List<Course> studentCourse;
 
     @Override
     public String toString() {

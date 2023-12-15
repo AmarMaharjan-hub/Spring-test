@@ -1,8 +1,10 @@
 package com.springtest.springtest.student;
 
+import com.springtest.springtest.course.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,9 +13,11 @@ import java.util.stream.Collectors;
 public class StudentController {
 
     private final StudentService studentService;
+    private final CourseService courseService;
     @Autowired
-    public StudentController(StudentService studentService) {
+    public StudentController(StudentService studentService, CourseService courseService) {
         this.studentService = studentService;
+        this.courseService = courseService;
     }
     @GetMapping
     public List<StudentDTO> getStudents(){
@@ -31,26 +35,54 @@ public class StudentController {
         return "done";
     }
 
+    @PostMapping("/initializeStudents")
+    public void initializeStudents(@RequestBody List<Student> students){
+        studentService.addMultipleStudents(students);
+    }
+
     @PutMapping
     public void updateStudent(
-             @RequestBody StudentRequestDTO studentRequestDTO
+             @RequestBody StudentUpdateRequestDTO studentUpdateRequestDTO
     ){
-        Student student = StudentMapper.toCourse(studentRequestDTO);
-        studentService.updateStudent(student);
+        studentService.updateStudent(StudentMapper.toStudent(studentUpdateRequestDTO));
     }
-//    @PutMapping(path = {"/id", "/studentName", "/studentAddress", "/studentContactNo", "/studentAge"})
-//    public void updateAllAllowedStudentField(
-//            @PathVariable("id") Long studentId,
-//            @PathVariable("studentName") String name,
-//            @PathVariable("studentAddress") String address,
-//            @PathVariable("studentContactNo") String contact,
-//            @PathVariable("studentAge") Integer age
-//    ){
-////        studentService.updateAllAllowedStudentField()
-//
-//    }
-    @DeleteMapping(path = "/studentId/{studentId}")
+    @DeleteMapping(path = "/{studentId}")
     public void deleteStudent(@PathVariable("studentId") Long studentId){
         studentService.deleteStudent(studentId);
+    }
+    @PutMapping("/{studentId}/courseId/{courseId}")
+    public void courseToStudent(
+            @PathVariable("studentId") Long studentId,
+            @PathVariable("courseId") Long courseId
+    ){
+        studentService.courseToStudent(studentId, courseId);
+    }
+//    @PutMapping("/multipleCourseToStudent")
+//    public void multipleCourseToStudent(
+//            @RequestBody StudentCourseDTO studentCourseDTO
+//    ){
+//        studentService.multipleCourseToStudent(
+//            StudentMapper.courseToStudent(
+//                studentCourseDTO.getStudentId()
+//            ),
+//            studentCourseDTO
+//                    .getCourseIdList()
+//                    .stream()
+//                    .map(courseService::courseById)
+//                    .collect(Collectors.toList())
+//        );
+//    }
+    @PutMapping("/multipleCourseToStudent/{studentId}/")
+    public void multipleCourseToStudent(
+            @PathVariable("studentId") Long studentId,
+            @RequestBody List<Long> courseIdList
+    ){
+        studentService.multipleCourseToStudent(
+            studentService.studentById(studentId),
+            courseIdList
+                    .stream()
+                    .map(courseService::courseById)
+                    .collect(Collectors.toList())
+        );
     }
 }

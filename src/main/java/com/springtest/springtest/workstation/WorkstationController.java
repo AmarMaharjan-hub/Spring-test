@@ -9,8 +9,8 @@ import java.util.List;
 public class WorkstationController {
     private final WorkstationService workstationService;
 
-    public WorkstationController(WorkstationService wrokstationService) {
-        this.workstationService = wrokstationService;
+    public WorkstationController(WorkstationService workstationService) {
+        this.workstationService = workstationService;
     }
     @GetMapping
     public List<Workstation> getAllWorkstation(){
